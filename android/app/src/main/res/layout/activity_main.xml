@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    android:background="#FFFAFAFA">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Veglia"
+        android:textSize="28sp"
+        android:textColor="#FF333333"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Not connected"
+        android:textSize="16sp"
+        android:textColor="#FF999999"
+        android:layout_marginBottom="48dp" />
+
+    <Button
+        android:id="@+id/toggleButton"
+        android:layout_width="200dp"
+        android:layout_height="56dp"
+        android:text="Start"
+        android:textSize="18sp"
+        android:textColor="#FFFFFFFF"
+        android:background="#FF4A90D9" />
+
+    <EditText
+        android:id="@+id/serverUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Server address"
+        android:textSize="14sp"
+        android:layout_marginTop="48dp"
+        android:inputType="textUri"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/tokenInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Token"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        android:inputType="textPassword"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/shizukuStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shizuku: unknown"
+        android:textSize="13sp"
+        android:textColor="#FF999999"
+        android:layout_marginTop="32dp" />
+
+    <Button
+        android:id="@+id/shizukuButton"
+        android:layout_width="240dp"
+        android:layout_height="48dp"
+        android:text="Enable phone control"
+        android:textSize="14sp"
+        android:textColor="#FFFFFFFF"
+        android:background="#FF8A6FD8"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

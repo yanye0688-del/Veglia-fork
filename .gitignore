@@ -1,0 +1,18 @@
+# secrets & local config
+.env
+server/.env
+
+# runtime data — never commit real screenshots
+server/data/
+data/
+
+# android build artifacts & signing keys
+android/build/
+*.apk
+*.idsig
+*.jks
+*.keystore
+
+# python
+__pycache__/
+*.pyc

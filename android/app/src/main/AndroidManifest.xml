@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="dev.veglia.companion"
+    android:versionCode="8"
+    android:versionName="0.7.0-headset">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+
+    <!-- Alarm setting: sending SET_ALARM through Shizuku's shell identity does
+         not work, because the shell package does not declare SET_ALARM and some
+         clock apps silently ignore callers without it (the command still returns
+         exit_code 0, which is the nasty part). SET_ALARM is a normal permission:
+         the app declares it and has it after install, no prompt and no root.
+         So the app sets alarms under its own identity. The related wake-up
+         permissions are declared here too, to save a rebuild later. -->
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- Floating caption overlay: a small box drawn over any app that can be
+         hidden. A caption notification disappears quickly and long lines are hard
+         to read. This permission must be granted by hand in system settings
+         ("display over other apps"); it is not granted at install. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Start on boot: after a reboot the service would otherwise stay down until
+         the phone's owner opens the app by hand. This permission plus the
+         BootReceiver below bring it back on its own. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Generic BLE bridge. Android 12+ uses the first two BLUETOOTH_* entries,
+         older versions use the last three. neverForLocation tells the system the
+         app does not derive location from Bluetooth, which avoids the location
+         permission prompt. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+
+    <application
+        android:label="Veglia"
+        android:icon="@drawable/ic_launcher"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+
+        <!-- Hand-off point for the Shizuku binder — required even on the
+             ADB/wireless-debugging (v11+) path, not just legacy root mode. -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="dev.veglia.companion.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".CompanionService"
+            android:exported="false" />
+
+        <!-- Restarts the polling service after a reboot or an app update. -->
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".ScreenshotService"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_config" />
+        </service>
+
+    </application>
+</manifest>
