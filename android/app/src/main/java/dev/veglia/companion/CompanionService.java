@@ -483,6 +483,13 @@ public class CompanionService extends Service {
                 player.release();
                 player = null;
             }
+            // Give the audio routing back to the system, so other apps are not left in call mode.
+            android.media.AudioManager am =
+                    (android.media.AudioManager) getSystemService(android.content.Context.AUDIO_SERVICE);
+            if (am != null) {
+                am.setMode(android.media.AudioManager.MODE_NORMAL);
+                am.setSpeakerphoneOn(false);
+            }
         } catch (Exception ignored) {
         }
     }

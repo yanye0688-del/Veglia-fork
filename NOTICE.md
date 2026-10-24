@@ -18,13 +18,21 @@ On the server (`server/veglia_server.py`):
 - shell-command control endpoints (`/phone/control-enqueue`, `/phone/control-result`,
   `/phone/control-last-result`)
 - alarm, generic BLE-write and audio-playback endpoints
-- app-switch events with debouncing and noise filtering
+- app-switch events with debouncing and noise filtering (the base version had removed
+  foreground-app reporting; this fork adds it back, so say so to the person whose phone it is)
 
 On the Android app:
 
-- Shizuku shell bridge, boot receiver, alarm setting under the app's own identity
+- Shizuku shell bridge with a status/permission button on the main screen
+- boot/update receiver that restarts the service and respects an explicit Stop
+- alarm setting under the app's own identity
+- foreground-app reporting
 - a generic BLE write bridge (`BleBridge`) whose target device is configured at runtime
 - native audio playback with optional earpiece routing
 - a floating caption overlay and a caption-notification fallback
 
-Modifications are © their authors and released under the same MIT license.
+Modifications are © the contributors of this fork and released under the same MIT license.
+The original copyright notice of Evelyn & River is kept in LICENSE.
+
+Server hardening in this fork: constant-time token comparison, the token is redacted
+from logs, and the server refuses empty, placeholder or short tokens.

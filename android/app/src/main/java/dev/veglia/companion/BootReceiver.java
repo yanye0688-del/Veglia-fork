@@ -24,6 +24,11 @@ public class BootReceiver extends BroadcastReceiver {
             if (serverUrl == null || token == null || serverUrl.isEmpty() || token.isEmpty()) {
                 return;
             }
+            // Respect an explicit Stop: if the user stopped the service, a reboot or an app
+            // update must not start it again until they start it by hand.
+            if (prefs.getBoolean("user_stopped", false)) {
+                return;
+            }
 
             Intent svc = new Intent(context, CompanionService.class);
             svc.putExtra("server_url", serverUrl);

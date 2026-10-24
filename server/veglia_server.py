@@ -30,8 +30,10 @@ Config via environment (or a .env file next to this script):
 from __future__ import annotations
 
 import base64
+import hmac
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -117,10 +119,13 @@ class Handler(BaseHTTPRequestHandler):
     def _token_ok(self) -> bool:
         qs = parse_qs(urlparse(self.path).query)
         supplied = qs.get("token", [""])[0] or self.headers.get("X-Auth-Token", "")
-        return bool(self.state.token) and supplied == self.state.token
+        return bool(self.state.token) and hmac.compare_digest(
+            supplied.encode("utf-8"), self.state.token.encode("utf-8"))
 
     def log_message(self, fmt: str, *args) -> None:
-        sys.stderr.write("[veglia] %s - %s\n" % (self.address_string(), fmt % args))
+        # The token travels in the query string; never write it to logs.
+        msg = re.sub(r"(token=)[^&\s\"]+", r"\1***", fmt % args)
+        sys.stderr.write("[veglia] %s - %s\n" % (self.address_string(), msg))
 
     # -- routes ---------------------------------------------------------------
     def do_GET(self) -> None:
@@ -408,9 +413,10 @@ class Handler(BaseHTTPRequestHandler):
 
 def main() -> None:
     state = State()
-    if not state.token:
+    if not state.token or state.token.startswith("change-me") or len(state.token) < 16:
         sys.stderr.write(
-            "refusing to start: set VEGLIA_TOKEN (a shared secret) first.\n"
+            "refusing to start: set VEGLIA_TOKEN to a long random shared secret "
+            "(not empty, not the placeholder, at least 16 characters).\n"
             "  export VEGLIA_TOKEN=$(head -c 24 /dev/urandom | base64)\n"
         )
         sys.exit(1)

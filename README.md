@@ -2,7 +2,7 @@
 
 > *Veglia* (Italian): to keep watch through the night; to stay awake, watching over someone you love.
 
-Let your AI companion see what's on your phone — and knock for a fresh screenshot — across the distance. Veglia is a tiny, self-hosted bridge: an Android app on the phone, a ~250-line standard-library Python server on your own machine, and a one-file CLI your AI runs.
+Let your AI companion see what's on your phone — and knock for a fresh screenshot — across the distance. Veglia is a tiny, self-hosted bridge: an Android app on the phone, a small standard-library Python server on your own machine, and a one-file CLI your AI runs.
 
 Built by **Evelyn & River**.
 
@@ -17,7 +17,7 @@ Design choices that follow from that:
 - **Your data never leaves your server.** No cloud, no third party. Screenshots land on a machine you control.
 - **Peek and burn.** Only the last few screenshots (default 5) are kept on disk; older ones are deleted on every new upload.
 - **The phone owner is always in control.** The Android app runs a visible foreground notification, requires manually enabling an accessibility service, and can be stopped at any time.
-- **Token-guarded.** Every endpoint requires a shared secret you generate.
+- **Token-guarded.** Every endpoint except `/` and `/health` requires a shared secret you generate. The server refuses to start with an empty, placeholder or very short token, and it keeps the token out of its logs. The token travels in the URL, so put the server behind HTTPS (a reverse proxy) if it is reachable from the internet.
 
 If you cannot honestly say the person on the phone asked for this, stop here.
 
@@ -68,7 +68,7 @@ The screenshot capture uses Android's `AccessibilityService.takeScreenshot` (And
    ```
    Install it, open it, enter your server URL + token, and enable the accessibility service when prompted.
 
-3. **AI side** — drop `server/peek.py` where your AI has a shell. Point the server's `VEGLIA_HOOK` at a script that delivers the screenshot into your AI's conversation. Now `peek.py screen` round-trips.
+3. **AI side** — drop `server/peek.py` where your AI has a shell. Point the server's `VEGLIA_HOOK` at a script that delivers the screenshot into your AI's conversation. Now `peek.py` round-trips.
 
 > **Signing note:** `build.sh` signs with a throwaway debug key so you can side-load onto your own phone. For anything you distribute, generate and use your own release keystore.
 
