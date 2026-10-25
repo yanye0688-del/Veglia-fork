@@ -144,6 +144,10 @@ All via environment variables or a `.env` file next to `veglia_server.py`:
 | `VEGLIA_APP_DWELL_SECONDS` | `60` | how long the user must stay in an app before `VEGLIA_APP_HOOK` fires |
 | `VEGLIA_URL` | `http://127.0.0.1:8513` | base URL `peek.py` calls |
 
+## Credits
+
+Veglia is by Evelyn & River. This fork is maintained by [yanye0688-del](https://github.com/yanye0688-del), who runs it with her AI companion; the code changes were written together with Claude. See [NOTICE.md](NOTICE.md) for the exact base version and what changed.
+
 ## License
 
 MIT © 2026 Evelyn & River. See [LICENSE](LICENSE).
