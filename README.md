@@ -34,7 +34,7 @@ If you cannot honestly say the person on the phone asked for this, stop here.
 | Your AI sets an alarm | `/phone/alarm-enqueue` |
 | Your AI plays audio on the phone, with an optional caption | `/phone/audio-enqueue` (speaker or earpiece; caption overlay or notification) |
 | Your AI writes bytes to a BLE device | `/phone/ble-enqueue`, generic: you configure the target device name and UUIDs |
-| The phone sends a file to your server, silently | `/phone/upload` (token-guarded, saved to `data/uploads/`; used by the optional [heart-rate recipe](docs/heart-rate.md) with Gadgetbridge) |
+| The phone sends a file to your server, silently | `/phone/upload` (token-guarded, saved to `data/uploads/`; used by the optional [watch-data recipe](docs/heart-rate.md): heart rate, steps and more through Gadgetbridge) |
 
 Details and `curl` examples for the endpoints added in this fork are in [docs/setup.md](docs/setup.md).
 

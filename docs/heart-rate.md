@@ -1,4 +1,4 @@
-# Reading a watch's heart rate through Gadgetbridge (optional recipe)
+# Reading a watch's data (heart rate and more) through Gadgetbridge (optional recipe)
 
 This is **not part of the Veglia app**. It is a recipe built from three things Veglia
 already gives you: the Shizuku shell endpoint, the phone's own `curl`, and the generic
@@ -41,6 +41,22 @@ phone runs it a few seconds to a couple of minutes later (it polls).
                            "where HEART_RATE > 0 order by TIMESTAMP desc limit 8"):
        print(ts, hr)
    ```
+
+## It is not only heart rate
+
+The exported file is Gadgetbridge's whole database, so the same four steps give you whatever the
+watch records, not just heart rate. For the Xiaomi band this was written for, a second table
+holds one row per day (`TIMESTAMP` is milliseconds at local midnight):
+
+```python
+for row in c.execute("select TIMESTAMP, STEPS, ACTIVE_CALORIES, HR_RESTING, HR_MAX, HR_AVG "
+                     "from XIAOMI_DAILY_SUMMARY_SAMPLE order by TIMESTAMP desc limit 7"):
+    print(row)
+```
+
+Other things (sleep, stress, and so on) live in other tables whose names and columns depend on
+the watch. List them with `select name from sqlite_master`, look at the columns, and read them
+read-only. The same consent rule applies to every one of them.
 
 ## Things that will bite you
 
