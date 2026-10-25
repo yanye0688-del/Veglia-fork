@@ -18,6 +18,7 @@ On the server (`server/veglia_server.py`):
 - shell-command control endpoints (`/phone/control-enqueue`, `/phone/control-result`,
   `/phone/control-last-result`)
 - alarm, generic BLE-write and audio-playback endpoints
+- a generic file-upload endpoint (`/phone/upload`) and a written recipe for reading a watch's heart rate through Gadgetbridge (`docs/heart-rate.md`)
 - app-switch events with debouncing and noise filtering (the base version had removed
   foreground-app reporting; this fork adds it back, so say so to the person whose phone it is)
 

@@ -288,6 +288,12 @@ class Handler(BaseHTTPRequestHandler):
             }
             self._json(200, {"ok": True})
             return
+        if path == "/phone/upload":
+            if not self._token_ok():
+                self._json(403, {"error": ERR_BAD_TOKEN})
+                return
+            self._handle_upload()
+            return
         if path == "/phone/screenshot":
             if not self._token_ok():
                 self._json(403, {"error": ERR_BAD_TOKEN})
@@ -356,6 +362,44 @@ class Handler(BaseHTTPRequestHandler):
                 )
             except Exception as e:
                 self.log_message("app hook failed: %s", e)
+
+    # -- generic file upload ----------------------------------------------------
+    def _handle_upload(self) -> None:
+        """Save a file the phone sends into data/uploads/ without notifying anyone.
+
+        Meant for things like a Gadgetbridge database export (see docs/heart-rate.md).
+        Unlike /phone/screenshot it runs no hook and does no peek-and-burn rotation.
+        The name comes from ?name=, reduced to a safe basename.
+        """
+        length = int(self.headers.get("Content-Length", 0))
+        if length > MAX_UPLOAD_BYTES:
+            self._json(413, {"error": ERR_TOO_LARGE})
+            return
+        body = self.rfile.read(length) if length else b""
+        ctype = self.headers.get("Content-Type", "")
+        if "multipart/form-data" in ctype and "boundary=" in ctype:
+            boundary = ctype.split("boundary=", 1)[1].strip().strip('"')
+            for part in body.split(("--" + boundary).encode()):
+                if b"Content-Disposition" not in part or b"filename=" not in part:
+                    continue
+                header_end = part.find(b"\r\n\r\n")
+                if header_end < 0:
+                    continue
+                body = part[header_end + 4:]
+                if body.endswith(b"\r\n"):
+                    body = body[:-2]
+                break
+        if not body:
+            self._json(400, {"error": "empty upload"})
+            return
+        raw = (parse_qs(urlparse(self.path).query).get("name") or ["upload.bin"])[0]
+        name = re.sub(r"[^A-Za-z0-9._-]", "_", os.path.basename(raw)).lstrip(".") or "upload.bin"
+        updir = self.state.data_dir / "uploads"
+        updir.mkdir(parents=True, exist_ok=True)
+        dest = updir / name
+        dest.write_bytes(body)
+        self.log_message("upload saved: %s (%d bytes)", name, len(body))
+        self._json(200, {"ok": True, "path": str(dest.resolve()), "bytes": len(body)})
 
     # -- screenshot -----------------------------------------------------------
     def _handle_screenshot(self) -> None:
